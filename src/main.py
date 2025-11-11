@@ -7,6 +7,7 @@ import warnings
 
 from tasklist.components import TodoAppView
 from tasklist.login import PreLoginView
+from tasklist.configuration import Configuration
 
 import flet as ft
 
@@ -14,6 +15,8 @@ import flet as ft
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 logging.basicConfig(level=logging.INFO)
+
+config = Configuration()
 
 
 @ft.component
