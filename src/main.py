@@ -6,7 +6,7 @@ import warnings
 
 
 from tasklist.components import TodoAppView
-from tasklist.login import PreLoginView
+from tasklist.login import PreLoginView, AuthenticationStatus
 from tasklist.configuration import Configuration
 
 import flet as ft
@@ -21,30 +21,19 @@ config = Configuration()
 
 @ft.component
 def EnsureLoggedInView():
-    is_authenticated, set_is_authenticated = ft.use_state(False)
-    user, set_user = ft.use_state(None)
+    auth_status, _ = ft.use_state(AuthenticationStatus())
 
-    def initiate_login_flow():
-        # other login stuff goes here
-        set_user("Someone")
-        set_is_authenticated(True)
-        logging.info("Login successful")
-
-    def initiate_logout_flow():
-        # other login stuff goes here
-        set_user(None)
-        set_is_authenticated(False)
-        logging.info("Logout successful")
-
-    logging.info(f"Rendering EnsureLoggedInView -- Auth status is '{is_authenticated}'")
+    logging.info(
+        f"Rendering EnsureLoggedInView -- Auth status is '{auth_status.is_authenticated}'"
+    )
     # ft.context.page.auth
 
-    if not is_authenticated:
+    if not auth_status.is_authenticated:
         logging.info(f"Rendering EnsureLoggedInView -- returning PreLoginView")
-        return PreLoginView(initiate_login_flow=initiate_login_flow)
+        return PreLoginView(initiate_login_flow=auth_status.initiate_login_flow)
     else:
         logging.info(f"Rendering EnsureLoggedInView -- returning TodoAppView")
-        return TodoAppView(initiate_logout_flow=initiate_logout_flow)
+        return TodoAppView(initiate_logout_flow=auth_status.initiate_logout_flow)
 
 
 @ft.component
