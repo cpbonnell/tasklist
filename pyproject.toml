@@ -8,7 +8,10 @@ authors = [
     { name = "Flet developer", email = "you@example.com" }
 ]
 dependencies = [
-  "flet==0.70.0.dev6561"
+  "flet==0.70.0.dev6561",
+  "pydantic (>=2.12.4,<3.0.0)",
+  "pydantic-settings (>=2.12.0,<3.0.0)",
+  "python-dotenv (>=1.2.1,<2.0.0)"
 ]
 
 [dependency-groups]
@@ -18,10 +21,10 @@ dev = [
 
 [tool.flet]
 # Docs: https://flet.dev/docs/publish
-org = "com.mycompany"
+org = "com.ravensoftanalytics"
 product = "tasklist"
-company = "Flet"
-copyright = "Copyright (C) 2025 by Flet"
+company = "Ravensoft"
+copyright = "Copyright (C) 2025 by Ravensoft Analytics"
 
 [tool.flet.app]
 path = "src"
