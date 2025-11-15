@@ -1,15 +1,12 @@
 import logging
-from dataclasses import dataclass, field
-from typing import Callable, cast
-
 import warnings
 
-from flet.auth.providers import Auth0OAuthProvider
-from tasklist.components import TodoAppView
-from tasklist.login import PreLoginView, AuthenticationStatus
-from tasklist.configuration import Configuration
-
 import flet as ft
+from flet.auth.providers import Auth0OAuthProvider
+
+from tasklist.components import TodoAppView
+from tasklist.configuration import Configuration
+from tasklist.login import AuthenticationStatus, PreLoginView
 
 # ignore *all* DeprecationWarnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -35,7 +32,7 @@ def EnsureLoggedInView(auth_status: AuthenticationStatus):
         return TodoAppView(initiate_logout_flow=auth_status.initiate_logout_flow)
 
 
-def main(page: ft.Page):
+async def main(page: ft.Page):
     # Set up Auth0 provider
     provider = Auth0OAuthProvider(
         domain=CONFIG.auth0_domain,
@@ -43,7 +40,7 @@ def main(page: ft.Page):
         client_secret=CONFIG.auth0_client_secret,
         redirect_url="http://localhost:8550/oauth_callback",
     )
-    auth_status = AuthenticationStatus(provider=provider)
+    auth_status = AuthenticationStatus(config=CONFIG, provider=provider)
 
     page.on_login = auth_status.on_login
     page.on_logout = auth_status.on_logout

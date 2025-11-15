@@ -9,3 +9,4 @@ class Configuration(BaseSettings):
     auth0_client_id: str
     auth0_client_secret: str
     auth0_audience: str
+    app_secret_key: str

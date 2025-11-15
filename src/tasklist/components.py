@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Callable, cast
+from typing import Callable, cast, Coroutine
 import logging
 
 import flet as ft
@@ -66,7 +66,7 @@ class TodoAppState:
 
 
 @ft.component
-def TodoAppView(initiate_logout_flow: Callable[..., None] | None = None):
+def TodoAppView(initiate_logout_flow: Coroutine | None = None):
     logging.info("Starting TodoAppView")
     state, _ = ft.use_state(lambda: TodoAppState())
     new_task_name, set_new_task_name = ft.use_state("")
@@ -206,7 +206,7 @@ def Header():
 
 
 @ft.component
-def HeaderBar(initiate_logout_flow: Callable[..., None] | None = None):
+def HeaderBar(initiate_logout_flow: Coroutine | None = None):
     return ft.AppBar(
         bgcolor=ft.Colors.SURFACE_CONTAINER,
         center_title=True,
