@@ -8,6 +8,7 @@ from flet.auth.providers import Auth0OAuthProvider
 from flet.security import encrypt, decrypt
 from flet.controls.control_event import Event, EventControlType
 from tasklist.configuration import Configuration
+from flet.auth.authorization_service import AuthorizationService
 
 import logging
 
@@ -16,6 +17,7 @@ import logging
 class AuthenticationStatus(ft.Observable):
     config: Configuration
     provider: Auth0OAuthProvider | None = None
+    _page: ft.Page | None = field(default=None, compare=False, repr=False)
     is_authenticated: bool = False
     AUTH_TOKEN_KEY = "app.auth_token"
 
@@ -23,7 +25,7 @@ class AuthenticationStatus(ft.Observable):
     # These methods initiate auth workflows
     async def initiate_login_flow(self, e: Event[EventControlType]):
         logging.info(f"Initiating login flow with Auth0, event {e}")
-        page = ft.context.page
+        page = self._page
 
         saved_token = None
         ejt = await page.shared_preferences.get(self.AUTH_TOKEN_KEY)
@@ -37,7 +39,7 @@ class AuthenticationStatus(ft.Observable):
     async def initiate_logout_flow(self):
         # other login stuff goes here
         logging.info("Initiating logout flow with Auth0")
-        page = ft.context.page
+        page = self._page
         await page.shared_preferences.remove(self.AUTH_TOKEN_KEY)
         page.logout()
 
@@ -45,10 +47,15 @@ class AuthenticationStatus(ft.Observable):
     # These methods are called in response to events in the auth workflow
     async def on_login_succeeded(self, e: ft.LoginEvent):
         logging.info("Login succeeded")
-        page = ft.context.page
+        page = self._page
 
         # save token in a client storage
-        jt = page.auth.token.to_json()
+        auth = page.auth
+        assert isinstance(
+            auth, AuthorizationService
+        ), f"Expected a page.auth of type AuthorizationService but got {type(auth)}"
+        token = await auth.get_token()
+        jt = token.to_json()
         ejt = encrypt(jt, self.config.app_secret_key)
         logging.info(f"Storing auth token: {ejt}")
         await page.shared_preferences.set(self.AUTH_TOKEN_KEY, ejt)

@@ -40,7 +40,7 @@ async def main(page: ft.Page):
         client_secret=CONFIG.auth0_client_secret,
         redirect_url="http://localhost:8550/oauth_callback",
     )
-    auth_status = AuthenticationStatus(config=CONFIG, provider=provider)
+    auth_status = AuthenticationStatus(config=CONFIG, provider=provider, _page=page)
 
     page.on_login = auth_status.on_login
     page.on_logout = auth_status.on_logout
