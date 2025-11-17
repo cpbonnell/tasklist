@@ -1,6 +1,6 @@
-from dataclasses import dataclass, field
-from typing import Callable, cast, Coroutine
 import logging
+from dataclasses import dataclass, field
+from typing import Callable, Coroutine, cast
 
 import flet as ft
 
@@ -193,25 +193,14 @@ def TaskItemView(task: TaskItem, delete_task, key=None) -> ft.Control:
 
 
 @ft.component
-def Header():
-    return ft.Row(
-        [
-            ft.Text(
-                value="Todos",
-                theme_style=ft.TextThemeStyle.HEADLINE_MEDIUM,
-            )
-        ],
-        alignment=ft.MainAxisAlignment.CENTER,
-    )
-
-
-@ft.component
 def HeaderBar(initiate_logout_flow: Coroutine | None = None):
+    user_name = ft.context.page.auth.user["name"]
+
     return ft.AppBar(
         bgcolor=ft.Colors.SURFACE_CONTAINER,
         center_title=True,
         title=ft.Text(
-            value="Todos",
+            value=f"Todos for {user_name}",
             theme_style=ft.TextThemeStyle.HEADLINE_MEDIUM,
         ),
         actions=[
@@ -219,6 +208,9 @@ def HeaderBar(initiate_logout_flow: Coroutine | None = None):
                 items=[
                     ft.PopupMenuItem(content="Item 1"),
                     ft.PopupMenuItem(content="Item 2"),
+                    ft.PopupMenuItem(
+                        content="User Details", on_click=display_user_details_popup
+                    ),
                     ft.PopupMenuItem(),  # divider
                     ft.PopupMenuItem(
                         content="Logout", checked=False, on_click=initiate_logout_flow
@@ -242,3 +234,27 @@ def Footer(active_tasks_number: int, clear_completed):
             ),
         ],
     )
+
+
+def display_user_details_popup(e):
+    page = ft.context.page
+    user = page.auth.user
+
+    user_details_text = f"""
+        Name: {user.get("name")}
+        Login: {user.get("login")}
+        Email: {user.get("email")}
+        ID: {user.id}
+        other keys -- {user.keys()}
+    """
+
+    dlg = ft.AlertDialog(
+        modal=True,
+        title=ft.Text("User Details"),
+        content=ft.Text(user_details_text),
+        actions=[
+            ft.TextButton("OK", on_click=lambda e: page.pop_dialog(dlg)),
+        ],
+    )
+
+    page.show_dialog(dlg)
